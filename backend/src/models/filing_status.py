@@ -1,0 +1,11 @@
+"""Filing status enum — mirrors IRS Form 1040 filing statuses."""
+
+from enum import StrEnum
+
+
+class FilingStatus(StrEnum):
+    SINGLE = "SINGLE"
+    MARRIED_FILING_JOINTLY = "MARRIED_FILING_JOINTLY"
+    MARRIED_FILING_SEPARATELY = "MARRIED_FILING_SEPARATELY"
+    HEAD_OF_HOUSEHOLD = "HEAD_OF_HOUSEHOLD"
+    QUALIFYING_SURVIVING_SPOUSE = "QUALIFYING_SURVIVING_SPOUSE"
