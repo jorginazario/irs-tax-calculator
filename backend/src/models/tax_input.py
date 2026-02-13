@@ -71,3 +71,52 @@ class AGIInput(BaseModel):
 
     gross_income: GrossIncome
     above_line_deductions: AboveLineDeductions = AboveLineDeductions()
+
+
+class CapitalGainsTaxInput(BaseModel):
+    """Input for the capital gains tax tool."""
+
+    short_term_gains: Decimal = Field(default=Decimal("0"), description="1099-B short-term gains")
+    long_term_gains: Decimal = Field(default=Decimal("0"), description="1099-B long-term gains")
+    ordinary_income: Decimal = Field(
+        ge=0, description="Ordinary taxable income (for stacking)"
+    )
+    filing_status: FilingStatus
+
+
+class QualifiedDividendTaxInput(BaseModel):
+    """Input for the qualified dividend tax tool."""
+
+    qualified_dividends: Decimal = Field(ge=0, description="1099-DIV qualified dividends")
+    ordinary_income: Decimal = Field(
+        ge=0, description="Ordinary taxable income (for stacking)"
+    )
+    filing_status: FilingStatus
+
+
+class NiitInput(BaseModel):
+    """Input for the Net Investment Income Tax tool."""
+
+    magi: Decimal = Field(ge=0, description="Modified Adjusted Gross Income")
+    net_investment_income: Decimal = Field(ge=0, description="Net investment income")
+    filing_status: FilingStatus
+
+
+class FicaInput(BaseModel):
+    """Input for the FICA / self-employment tax tool."""
+
+    w2_wages: Decimal = Field(default=Decimal("0"), ge=0, description="W-2 wages")
+    self_employment_income: Decimal = Field(
+        default=Decimal("0"), ge=0, description="Net self-employment income"
+    )
+    filing_status: FilingStatus
+
+
+class CreditInput(BaseModel):
+    """Input for the apply_credit tool."""
+
+    tax_owed: Decimal = Field(description="Tax before credit")
+    credit_amount: Decimal = Field(ge=0, description="Credit amount to apply")
+    is_refundable: bool = Field(
+        default=False, description="If True, credit can reduce tax below $0"
+    )
