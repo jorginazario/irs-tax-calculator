@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:taxfoundation.org)",
+      "WebFetch(domain:bradfordtaxinstitute.com)",
+      "WebFetch(domain:www.irs.gov)",
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(pip install:*)",
+      "Bash(python -m ruff:*)",
+      "Bash(ruff check:*)",
+      "Bash(where:*)",
+      "Bash(python:*)",
+      "Bash(C:UsersjnazaAppDataRoamingPythonPython312Scriptsruff.exe check \"C:\\\\Users\\\\jnaza\\\\Documents\\\\vs-code\\\\head-of-growth\\\\edison\\\\033_TaskTracker-ClaudeCode\\\\backend\\\\src\" \"C:\\\\Users\\\\jnaza\\\\Documents\\\\vs-code\\\\head-of-growth\\\\edison\\\\033_TaskTracker-ClaudeCode\\\\backend\\\\tests\")",
+      "Bash(\"C:/Users/jnaza/AppData/Roaming/Python/Python312/Scripts/ruff.exe\" check \"C:/Users/jnaza/Documents/vs-code/head-of-growth/edison/033_TaskTracker-ClaudeCode/backend/src\" \"C:/Users/jnaza/Documents/vs-code/head-of-growth/edison/033_TaskTracker-ClaudeCode/backend/tests\")",
+      "Bash(\"C:/Users/jnaza/AppData/Roaming/Python/Python312/Scripts/ruff.exe\" check --fix \"C:/Users/jnaza/Documents/vs-code/head-of-growth/edison/033_TaskTracker-ClaudeCode/backend/src\" \"C:/Users/jnaza/Documents/vs-code/head-of-growth/edison/033_TaskTracker-ClaudeCode/backend/tests\")",
+      "Bash(git status:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npm run dev:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh repo create:*)",
+      "Bash(git remote add:*)",
+      "Bash(git subtree split:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote:*)"
+    ]
+  }
+}
