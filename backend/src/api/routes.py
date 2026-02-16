@@ -2,16 +2,24 @@
 
 from decimal import Decimal
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from src.api.models import (
     BracketEntry,
     BracketsResponse,
+    CalculationDetail,
+    CalculationSummary,
     DeductionsResponse,
+    DeleteResponse,
     EstimateInput,
     EstimateResult,
 )
 from src.data.tax_year_2024 import FEDERAL_BRACKETS, STANDARD_DEDUCTION
+from src.database.repository import (
+    delete_calculation,
+    get_calculation,
+    list_calculations,
+)
 from src.models.workflow_models import FullTaxCalculationResult, TaxReturnInput
 from src.tools.calculate_bracket_tax import calculate_bracket_tax
 from src.tools.lookup_standard_deduction import lookup_standard_deduction
@@ -68,3 +76,33 @@ def get_brackets() -> BracketsResponse:
 def get_deductions() -> DeductionsResponse:
     """Return 2024 standard deduction amounts for all filing statuses."""
     return DeductionsResponse(standard_deductions=STANDARD_DEDUCTION)
+
+
+# ---------------------------------------------------------------------------
+# History endpoints
+# ---------------------------------------------------------------------------
+
+
+@router.get("/history", response_model=list[CalculationSummary])
+def history_list() -> list[CalculationSummary]:
+    """List all saved tax calculations (newest first)."""
+    rows = list_calculations()
+    return [CalculationSummary(**row) for row in rows]
+
+
+@router.get("/history/{calc_id}", response_model=CalculationDetail)
+def history_detail(calc_id: int) -> CalculationDetail:
+    """Return a single saved calculation with full input/result data."""
+    row = get_calculation(calc_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="Calculation not found")
+    return CalculationDetail(**row)
+
+
+@router.delete("/history/{calc_id}", response_model=DeleteResponse)
+def history_delete(calc_id: int) -> DeleteResponse:
+    """Delete a saved calculation by id."""
+    deleted = delete_calculation(calc_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Calculation not found")
+    return DeleteResponse(success=True, message=f"Calculation {calc_id} deleted")

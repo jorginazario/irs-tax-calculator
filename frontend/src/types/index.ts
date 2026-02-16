@@ -21,4 +21,8 @@ export type {
   BracketEntry,
   BracketsResponse,
   DeductionsResponse,
+  CalculationSummary,
+  CalculationDetail,
+  DeleteResponse,
+  AnalysisTool,
 } from './tax.ts';

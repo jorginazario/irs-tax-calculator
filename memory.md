@@ -50,9 +50,47 @@
   - `frontend/src/pages/CalculatorPage.tsx` — main page composing all components
   - TailwindCSS styling, responsive layout, green/red color-coding for refund/owed
 
-## Current Phase: Phase 4 — Polish
+### Phase 4: SQLite Database + MCP Data Analyst Server ✅
+- **SQLite Database** (175 backend tests pass):
+  - `backend/src/database/db.py` — Connection manager (raw sqlite3, no ORM)
+  - `backend/src/database/schema.sql` — tax_calculations table
+  - `backend/src/database/repository.py` — CRUD: save, list, get, delete calculations
+  - Auto-persist: orchestrator.py auto-saves after calculate_full_tax() (try/except, won't break calc)
+  - History API routes: GET /api/history, GET /api/history/{id}, DELETE /api/history/{id}
+  - DB file: `backend/tax_data.db` (gitignored via *.db)
+  - Lifespan handler in main.py for DB init/close
+  - 10 new repository tests + 7 new history API integration tests
+- **MCP Data Analyst Server**:
+  - `mcp_server/server.py` — FastMCP server with 4 tools
+  - `mcp_server/context.py` — Tax domain knowledge for LLM system prompts
+  - `mcp_server/tools/query_data.py` — Natural language → SQL → results (read-only)
+  - `mcp_server/tools/create_chart.py` — LLM-driven Plotly chart generation (HTML output)
+  - `mcp_server/tools/create_table.py` — LLM-driven markdown table generation
+  - `mcp_server/tools/generate_report.py` — LLM-driven analytical report generation
+  - All tools use Claude API (anthropic SDK) with read-only SQL validation
+  - Run with: `python -m mcp_server.server`
 
-### What's needed:
+### Phase 5: History Page + Analytics Page ✅
+- **Frontend Routing** (react-router-dom):
+  - `frontend/src/main.tsx` — wrapped `<App>` in `<BrowserRouter>`
+  - `frontend/src/App.tsx` — shared header + `<NavBar>` + `<Routes>` (3 routes: `/`, `/history`, `/analytics`)
+  - `frontend/src/components/NavBar.tsx` — tab navigation with active state styling
+  - `frontend/src/pages/CalculatorPage.tsx` — refactored (header moved to App.tsx)
+- **History Page**:
+  - `frontend/src/hooks/useHistory.ts` — fetch, view detail, delete calculations
+  - `frontend/src/pages/HistoryPage.tsx` — card list, detail modal (reuses ResultsDisplay), delete with confirmation
+- **Analytics Page**:
+  - `frontend/src/hooks/useAnalysis.ts` — tool selector, prompt/result state, execute
+  - `frontend/src/pages/AnalyticsPage.tsx` — 4 tools (Query/Chart/Table/Report), prompt textarea, results rendering (pre/iframe/markdown)
+- **Backend Analysis API** (183 backend tests pass):
+  - `backend/src/api/analysis_routes.py` — 4 async endpoints wrapping MCP tool functions (query, chart, table, report)
+  - Imports MCP tools directly (not subprocess); uses sys.path hack for mcp_server package
+  - All endpoints check ANTHROPIC_API_KEY, return 503 if missing
+  - `backend/tests/integration/test_analysis_api.py` — 8 tests (4 API key guard + 4 mocked tool calls)
+- **Types**: Added CalculationSummary, CalculationDetail, DeleteResponse, AnalysisTool to `frontend/src/types/tax.ts`
+- **API Service**: Extended `taxApi` with 7 new methods (3 history + 4 analysis)
+
+## Remaining Polish
 - Agent layer (InputClassifierAgent, DeductionStrategyAgent)
 - Responsive design pass
 - End-to-end tests
@@ -63,11 +101,15 @@
 - Tools: `backend/src/tools/`
 - Workflows: `backend/src/workflows/`
 - Orchestrator: `backend/src/workflows/orchestrator.py`
+- Database: `backend/src/database/` (db.py, repository.py, schema.sql)
 - API: `backend/src/api/main.py` (entrypoint: `src.api.main:app`)
-- Frontend app: `frontend/src/App.tsx` → `CalculatorPage`
+- Analysis API: `backend/src/api/analysis_routes.py` (4 endpoints under /api/analysis/)
+- MCP Server: `mcp_server/server.py` (entrypoint: `python -m mcp_server.server`)
+- Frontend app: `frontend/src/App.tsx` → Routes (Calculator, History, Analytics)
 - Frontend types: `frontend/src/types/tax.ts`
 - Frontend components: `frontend/src/components/`
-- Tests: `backend/tests/` (158 tests), `frontend/src/utils/__tests__/` (38 tests)
+- Frontend pages: `frontend/src/pages/` (CalculatorPage, HistoryPage, AnalyticsPage)
+- Tests: `backend/tests/` (183 tests), `frontend/src/utils/__tests__/` (38 tests)
 
 ## Git
 - Remote: https://github.com/jorginazario/irs-tax-calculator

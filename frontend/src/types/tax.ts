@@ -194,3 +194,34 @@ export interface DeductionsResponse {
   tax_year: number;
   standard_deductions: Record<string, string>;
 }
+
+// --- History models (mirrors backend/src/api/models.py) ---
+
+export interface CalculationSummary {
+  id: number;
+  created_at: string;
+  filing_status: string;
+  total_income: number;
+  agi: number;
+  taxable_income: number;
+  federal_tax: number;
+  total_credits: number;
+  total_tax: number;
+  effective_rate: number;
+  marginal_rate: number;
+  refund_or_owed: number;
+}
+
+export interface CalculationDetail extends CalculationSummary {
+  input_data: TaxReturnInput;
+  result_data: FullTaxCalculationResult;
+}
+
+export interface DeleteResponse {
+  success: boolean;
+  message: string;
+}
+
+// --- Analytics models ---
+
+export type AnalysisTool = 'query' | 'chart' | 'table' | 'report';

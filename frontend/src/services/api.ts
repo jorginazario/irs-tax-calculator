@@ -5,6 +5,9 @@ import type {
   EstimateResult,
   BracketsResponse,
   DeductionsResponse,
+  CalculationSummary,
+  CalculationDetail,
+  DeleteResponse,
 } from '../types/index.ts';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api';
@@ -67,5 +70,56 @@ export const taxApi = {
   /** Get 2024 standard deductions — GET /api/deductions/2024 */
   getDeductions(): Promise<DeductionsResponse> {
     return request<DeductionsResponse>('/deductions/2024');
+  },
+
+  // --- History endpoints ---
+
+  /** List all saved calculations — GET /api/history */
+  getHistory(): Promise<CalculationSummary[]> {
+    return request<CalculationSummary[]>('/history');
+  },
+
+  /** Get a single saved calculation with full detail — GET /api/history/:id */
+  getHistoryDetail(id: number): Promise<CalculationDetail> {
+    return request<CalculationDetail>(`/history/${id}`);
+  },
+
+  /** Delete a saved calculation — DELETE /api/history/:id */
+  deleteCalculation(id: number): Promise<DeleteResponse> {
+    return request<DeleteResponse>(`/history/${id}`, { method: 'DELETE' });
+  },
+
+  // --- Analysis endpoints ---
+
+  /** Query tax data with natural language — POST /api/analysis/query */
+  analysisQuery(question: string): Promise<{ result: string }> {
+    return request<{ result: string }>('/analysis/query', {
+      method: 'POST',
+      body: JSON.stringify({ question }),
+    });
+  },
+
+  /** Generate a Plotly chart — POST /api/analysis/chart */
+  analysisChart(prompt: string): Promise<{ result: string }> {
+    return request<{ result: string }>('/analysis/chart', {
+      method: 'POST',
+      body: JSON.stringify({ prompt }),
+    });
+  },
+
+  /** Generate a markdown table — POST /api/analysis/table */
+  analysisTable(prompt: string): Promise<{ result: string }> {
+    return request<{ result: string }>('/analysis/table', {
+      method: 'POST',
+      body: JSON.stringify({ prompt }),
+    });
+  },
+
+  /** Generate an analytical report — POST /api/analysis/report */
+  analysisReport(prompt: string): Promise<{ result: string }> {
+    return request<{ result: string }>('/analysis/report', {
+      method: 'POST',
+      body: JSON.stringify({ prompt }),
+    });
   },
 };

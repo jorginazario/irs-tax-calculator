@@ -1,6 +1,7 @@
 """API-specific Pydantic models — request/response schemas for FastAPI endpoints."""
 
 from decimal import Decimal
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -51,3 +52,51 @@ class ErrorResponse(BaseModel):
     """Standard error response body."""
 
     detail: str
+
+
+# ---------------------------------------------------------------------------
+# History / persistence models
+# ---------------------------------------------------------------------------
+
+
+class CalculationSummary(BaseModel):
+    """Summary row returned by the list endpoint (no JSON blobs)."""
+
+    id: int
+    created_at: str
+    filing_status: str
+    total_income: float
+    agi: float
+    taxable_income: float
+    federal_tax: float
+    total_credits: float
+    total_tax: float
+    effective_rate: float
+    marginal_rate: float
+    refund_or_owed: float
+
+
+class CalculationDetail(BaseModel):
+    """Full calculation record including serialised input and result."""
+
+    id: int
+    created_at: str
+    filing_status: str
+    total_income: float
+    agi: float
+    taxable_income: float
+    federal_tax: float
+    total_credits: float
+    total_tax: float
+    effective_rate: float
+    marginal_rate: float
+    refund_or_owed: float
+    input_data: Any
+    result_data: Any
+
+
+class DeleteResponse(BaseModel):
+    """Response for delete operations."""
+
+    success: bool
+    message: str

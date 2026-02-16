@@ -41,113 +41,100 @@ export default function CalculatorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white shadow-sm">
-        <div className="mx-auto max-w-4xl px-4 py-6">
-          <h1 className="text-2xl font-bold text-gray-900">
-            IRS Tax Calculator
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Federal income tax estimation for Tax Year 2024
-          </p>
+    <main className="mx-auto max-w-4xl px-4 py-8">
+      {showError && (
+        <div className="mb-6">
+          <ErrorDisplay
+            message={error}
+            onDismiss={() => setDismissedError(error)}
+          />
         </div>
-      </header>
+      )}
 
-      <main className="mx-auto max-w-4xl px-4 py-8">
-        {showError && (
-          <div className="mb-6">
-            <ErrorDisplay
-              message={error}
-              onDismiss={() => setDismissedError(error)}
-            />
-          </div>
-        )}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <FilingStatusSelector
+          value={formData.filing_status}
+          isOver65={formData.is_over_65}
+          isBlind={formData.is_blind}
+          onChange={handleChange}
+        />
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <FilingStatusSelector
-            value={formData.filing_status}
-            isOver65={formData.is_over_65}
-            isBlind={formData.is_blind}
-            onChange={handleChange}
-          />
+        <IncomeSection formData={formData} onChange={handleChange} />
 
-          <IncomeSection formData={formData} onChange={handleChange} />
+        <DeductionSection formData={formData} onChange={handleChange} />
 
-          <DeductionSection formData={formData} onChange={handleChange} />
+        <CreditsSection
+          credits={formData.credits}
+          onChange={(credits) => handleChange({ credits })}
+        />
 
-          <CreditsSection
-            credits={formData.credits}
-            onChange={(credits) => handleChange({ credits })}
-          />
+        <PaymentsSection
+          estimatedPayments={formData.estimated_payments}
+          totalWithholding={totalWithholding}
+          onChange={(value) => handleChange({ estimated_payments: value })}
+        />
 
-          <PaymentsSection
-            estimatedPayments={formData.estimated_payments}
-            totalWithholding={totalWithholding}
-            onChange={(value) => handleChange({ estimated_payments: value })}
-          />
+        {/* Action Buttons */}
+        <div className="flex gap-4">
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="rounded-lg bg-blue-600 px-8 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <svg
+                  className="h-4 w-4 animate-spin"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
+                </svg>
+                Calculating...
+              </span>
+            ) : (
+              'Calculate Tax'
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={reset}
+            className="rounded-lg border border-gray-300 bg-white px-8 py-3 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+          >
+            Reset
+          </button>
+        </div>
+      </form>
 
-          {/* Action Buttons */}
-          <div className="flex gap-4">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="rounded-lg bg-blue-600 px-8 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isLoading ? (
-                <span className="flex items-center gap-2">
-                  <svg
-                    className="h-4 w-4 animate-spin"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                    />
-                  </svg>
-                  Calculating...
-                </span>
-              ) : (
-                'Calculate Tax'
-              )}
-            </button>
-            <button
-              type="button"
-              onClick={reset}
-              className="rounded-lg border border-gray-300 bg-white px-8 py-3 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
-            >
-              Reset
-            </button>
-          </div>
-        </form>
+      {/* Results */}
+      {result && (
+        <div className="mt-8">
+          <h2 className="mb-6 text-xl font-bold text-gray-900">
+            Tax Calculation Results
+          </h2>
+          <ResultsDisplay result={result} />
+        </div>
+      )}
 
-        {/* Results */}
-        {result && (
-          <div className="mt-8">
-            <h2 className="mb-6 text-xl font-bold text-gray-900">
-              Tax Calculation Results
-            </h2>
-            <ResultsDisplay result={result} />
-          </div>
-        )}
-
-        <footer className="mt-12 border-t border-gray-200 pt-6 pb-8 text-center text-xs text-gray-400">
-          <p>
-            This calculator provides estimates only. Consult a qualified tax
-            professional for official tax advice. Based on IRS tax tables and
-            rates for Tax Year 2024.
-          </p>
-        </footer>
-      </main>
-    </div>
+      <footer className="mt-12 border-t border-gray-200 pt-6 pb-8 text-center text-xs text-gray-400">
+        <p>
+          This calculator provides estimates only. Consult a qualified tax
+          professional for official tax advice. Based on IRS tax tables and
+          rates for Tax Year 2024.
+        </p>
+      </footer>
+    </main>
   );
 }

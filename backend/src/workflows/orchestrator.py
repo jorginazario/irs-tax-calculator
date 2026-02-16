@@ -3,6 +3,8 @@
 This is the single entry point that the API (Phase 3) will call.
 """
 
+import logging
+
 from src.models.workflow_models import FullTaxCalculationResult, TaxReturnInput
 from src.workflows.agi_workflow import run_agi_workflow
 from src.workflows.credits_workflow import run_credits_workflow
@@ -11,6 +13,8 @@ from src.workflows.fica_workflow import run_fica_workflow
 from src.workflows.income_workflow import run_income_workflow
 from src.workflows.summary_workflow import run_summary_workflow
 from src.workflows.tax_computation_workflow import run_tax_computation_workflow
+
+logger = logging.getLogger(__name__)
 
 
 def calculate_full_tax(tax_return: TaxReturnInput) -> FullTaxCalculationResult:
@@ -52,7 +56,7 @@ def calculate_full_tax(tax_return: TaxReturnInput) -> FullTaxCalculationResult:
         tax_return, income, agi, deductions, tax_computation, credits, fica
     )
 
-    return FullTaxCalculationResult(
+    result = FullTaxCalculationResult(
         income=income,
         fica=fica,
         agi=agi,
@@ -61,3 +65,13 @@ def calculate_full_tax(tax_return: TaxReturnInput) -> FullTaxCalculationResult:
         credits=credits,
         summary=summary,
     )
+
+    # Auto-persist to SQLite
+    try:
+        from src.database.repository import save_calculation
+
+        save_calculation(tax_return, result)
+    except Exception:
+        logger.warning("Failed to auto-save calculation to database", exc_info=True)
+
+    return result
